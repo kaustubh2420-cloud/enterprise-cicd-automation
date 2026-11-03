@@ -53,28 +53,4 @@ pipeline {
             echo 'CI pipeline failed. Check the console output.'
         }
     }
-}                  sleep 5
-
-                    curl --fail http://localhost:5002/health
-                    curl --fail http://localhost:5002/version
-                '''
-            }
-        }
-    }
-
-    post {
-        always {
-            sh '''
-                docker rm -f ${IMAGE_NAME}-${BUILD_NUMBER} || true
-            '''
-        }
-
-        success {
-            echo 'CI pipeline completed successfully!'
-        }
-
-        failure {
-            echo 'CI pipeline failed. Check the console output.'
-        }
-    }
 }
