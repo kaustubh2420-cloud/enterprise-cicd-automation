@@ -5,6 +5,8 @@ pipeline {
         IMAGE_NAME = "enterprise-cicd-app"
         IMAGE_TAG = "build-${BUILD_NUMBER}"
         CONTAINER_NAME = "enterprise-cicd-app-${BUILD_NUMBER}"
+        AWS_REGION = "ap-south-1"
+        ECR_REPOSITORY = "499989195436.dkr.ecr.ap-south-1.amazonaws.com/enterprise-cicd-app"
     }
 
     stages {
@@ -36,6 +38,21 @@ pipeline {
                     curl --fail http://${APP_IP}:5000/health
                     curl --fail http://${APP_IP}:5000/version
                 '''
+            }
+        }
+
+        stage('Verify AWS Credentials') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-jenkins-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                        export AWS_DEFAULT_REGION=${AWS_REGION}
+                        aws sts get-caller-identity
+                    '''
+                }
             }
         }
     }
